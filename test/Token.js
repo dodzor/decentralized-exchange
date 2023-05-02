@@ -14,20 +14,25 @@ describe('Token', () => {
     });
 
     describe('Deployment', () => {
+        let name = 'Decentralized Exchange Token';
+        let symbol = 'DEXT';
+        let decimals = '18';
+        let totalSupply = tokens('1000000');
+
         it('has correct name', async () => {
-            expect(await token.name()).to.equal('Decentralized Exchange Token');
+            expect(await token.name()).to.equal(name);
         });
     
         it('has correct symbol', async () => {
-            expect(await token.symbol()).to.equal('DEXT');
+            expect(await token.symbol()).to.equal(symbol);
         });
     
         it('has correct decimals', async () => {
-            expect(await token.decimals()).to.equal('18');
+            expect(await token.decimals()).to.equal(decimals);
         });
     
         it('has correct total suply', async () => {
-            expect(await token.totalSupply()).to.equal(tokens('1000000'));
+            expect(await token.totalSupply()).to.equal(totalSupply);
         });
     });
 })

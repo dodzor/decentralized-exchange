@@ -6,7 +6,7 @@ const tokens = (n) => {
 }
 
 describe('Token', () => {
-    let token, deployer, accounts, receiver, exchange;
+    let token, accounts, deployer, receiver, exchange;
 
     beforeEach(async () => {
         const Token = await ethers.getContractFactory('Token');
@@ -43,7 +43,7 @@ describe('Token', () => {
         it('assigns total supply to deployer', async () => {
             expect(await token.balanceOf(deployer.address)).to.equal(totalSupply);
         });
-    })
+    });
 
     describe('Sending tokens', () => {
         let amount, transaction, result;
@@ -84,6 +84,8 @@ describe('Token', () => {
     });
 
     describe('Approving tokens', () => { 
+        let amount, transaction, result;
+
         beforeEach(async () => {
             amount = await tokens(100);
             transaction = await token.connect(deployer).approve(exchange.address, amount);
@@ -109,7 +111,44 @@ describe('Token', () => {
                 await expect(token.connect(deployer).approve(ethers.constants.AddressZero, amount)).to.be.revertedWith('Invalid spender address');
             });
         });
-
     });
 
+    describe('Delegated token transfers', () => {
+        let amount, transaction, result;
+
+        beforeEach(async () => {
+            amount = await tokens(100);
+            await token.connect(deployer).approve(exchange.address, amount);
+        });
+
+        describe('Success', () => {
+            beforeEach(async () => {
+                transaction = await token.connect(exchange).transferFrom(deployer.address, receiver.address, amount);
+                result = await transaction.wait();
+            });
+
+            it('transfers token balances', async () => {
+                expect(await token.balanceOf(deployer.address)).to.equal(tokens(999900));
+                expect(await token.balanceOf(receiver.address)).to.equal(amount);
+            });
+
+            it('resets allowance to zero after transfer', async () => {
+                expect(await token.allowance(deployer.address, exchange.address)).to.equal(0);
+            });
+
+            it('emits Transfer event', async () => {
+                const event = result.events[0];
+                expect(event.event).to.equal('Transfer');
+                expect(event.args.from).to.equal(deployer.address);
+                expect(event.args.to).to.equal(receiver.address);
+                expect(event.args.value).to.equal(amount);
+            });
+        });
+
+        describe('Failure', () => {
+            it('rejects insufficient amounts', async () => {
+                await expect(token.connect(exchange).transferFrom(deployer.address, receiver.address, tokens(100000000))).to.be.revertedWith('Insufficient allowance');
+            });
+        });
+    });
 })

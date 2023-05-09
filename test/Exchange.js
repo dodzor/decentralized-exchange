@@ -70,4 +70,61 @@ describe('Exchange', () => {
             });
         });
     });
+
+    describe('Withdrawing tokens', () => {
+        let transaction, result;
+        const amount = tokens(100);
+
+        describe('Success', () => {
+            beforeEach(async () => {
+                transaction = await token.connect(user1).approve(exchange.address, amount);
+                result = await transaction.wait();
+    
+                transaction = await exchange.connect(user1).depositToken(token.address, amount);    
+                result = await transaction.wait();
+
+                transaction = await exchange.connect(user1).withdrawToken(token.address, amount);
+                result = await transaction.wait();
+            });
+    
+            it('tracks the token deposit', async () => {
+                expect(await token.balanceOf(exchange.address)).to.equal(0);
+                expect(await exchange.tokens(token.address, user1.address)).to.equal(0);
+                expect(await exchange.balanceOf(token.address, user1.address)).to.equal(0);
+            });
+    
+            it('emits Deposit event', async () => {
+                // const event = result.events[1];
+                const event = result.events.find((event) => event.event === 'Withdraw');
+                expect(event.event).to.equal('Withdraw');
+                expect(event.args.token).to.equal(token.address);
+                expect(event.args.user).to.equal(user1.address);
+                expect(event.args.amount.toString()).to.equal(amount);
+                expect(event.args.balance).to.equal(0);
+            });
+        });
+
+        describe('Failure', () => {
+            it('fails when no tokens are approved', async () => {
+                await expect(exchange.connect(user1).withdrawToken(token.address, amount)).to.be.revertedWith('Insufficient balance');
+            });
+        });
+    });
+
+    describe('Checking balances', () => {
+        let transaction, result;
+        const amount = tokens(100);
+
+        beforeEach(async () => {
+            transaction = await token.connect(user1).approve(exchange.address, amount);
+            result = await transaction.wait();
+
+            transaction = await exchange.connect(user1).depositToken(token.address, amount);    
+            result = await transaction.wait();
+        });
+
+        it('returns user balance', async () => {
+            expect(await exchange.balanceOf(token.address, user1.address)).to.equal(amount);
+        });
+    });
 });

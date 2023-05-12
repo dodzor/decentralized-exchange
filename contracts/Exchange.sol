@@ -12,6 +12,7 @@ contract Exchange {
 
     mapping(address => mapping(address => uint256)) public tokens;
     mapping(uint256 => _Order) public orders;
+    mapping(uint256 => bool) public orderCancelled;
 
     event Deposit(address token, address user, uint256 amount, uint256 balance);
     event Withdraw(address token, address user, uint256 amount, uint256 balance);
@@ -22,6 +23,14 @@ contract Exchange {
                 address tokenGive, 
                 uint256 amountGive, 
                 uint256 timestamp);
+
+    event Cancel(uint256 id, 
+            address user, 
+            address tokenGet, 
+            uint256 amountGet, 
+            address tokenGive, 
+            uint256 amountGive, 
+            uint256 timestamp);
 
     struct _Order {
         uint256 id;
@@ -64,6 +73,18 @@ contract Exchange {
         orders[orderCount] = _Order(orderCount, msg.sender, _tokenGet, _amountGet, _tokenGive, _amountGive, block.timestamp);
 
         emit Order(orderCount, msg.sender, _tokenGet, _amountGet, _tokenGive, _amountGive, block.timestamp);
+    }
+
+    function cancelOrder(uint256 _id) public {
+        _Order storage order = orders[_id];
+
+        require(order.id == _id, "Invalid order id");
+
+        require(msg.sender == order.user, "Invalid user");
+
+        orderCancelled[_id] = true;
+
+        emit Cancel(_id, order.user, order.tokenGet, order.amountGet, order.tokenGive, order.amountGive, block.timestamp);
     }
 
     // address public feeAccount; // the account that receives exchange fees

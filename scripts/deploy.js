@@ -1,16 +1,31 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
-const hre = require("hardhat");
+const tokens = (n) => {
+  return ethers.utils.parseUnits(n.toString(), 'ether');
+}
 
 async function main() {
+  console.log("Deploying contracts...");
+
   const Token = await hre.ethers.getContractFactory("Token");
-  const token = await Token.deploy();
-  await token.deployed();
-  console.log("Token deployed to:", token.address);
+  const Exchange = await hre.ethers.getContractFactory("Exchange");
+
+  const accounts = await hre.ethers.getSigners();
+  console.log(`Accounts fetched:\n${accounts[0].address}, \n${accounts[1].address}, \n${accounts[2].address}`);
+
+  const dext = await Token.deploy('Decentralized Exchange Token', 'DEXT', tokens(1000000));
+  await dext.deployed();
+  console.log("DEXT deployed to: ", dext.address);
+
+  const pir = await Token.deploy('Pirate Dolars', 'PIR', tokens(1000000));
+  await pir.deployed();
+  console.log("PIR deployed to: ", pir.address);
+
+  const mETH = await Token.deploy('Mock Ethereum', 'mETH', tokens(1000000));
+  await mETH.deployed();
+  console.log("mETH deployed to: ", mETH.address);
+
+  const exchange = await Exchange.deploy(accounts[1].address, 10);
+  await exchange.deployed();
+  console.log("Exchange deployed to: ", exchange.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

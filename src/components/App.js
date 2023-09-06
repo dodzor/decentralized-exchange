@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { loadNetwork, loadProvider, loadAccount, loadTokens, loadExchange } from '../store/interactions';
 import config from '../config';
+import Navbar from './Navbar';
 
 function App() {
 
@@ -13,7 +14,14 @@ function App() {
     const provider = loadProvider(dispatch);
     const chainId = await loadNetwork(dispatch, provider);
 
-    await loadAccount(dispatch, provider);
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload(); 
+    });
+
+    // Load account when account changes
+    window.ethereum.on('accountsChanged', () => {
+      loadAccount(dispatch, provider);
+    });
     
     const dext = config[chainId].DEXT;
     const meth = config[chainId].mETH;
@@ -31,7 +39,7 @@ function App() {
   return (
     <div>
 
-      {/* Navbar */}
+      <Navbar/>
 
       <main className='exchange grid'>
         <section className='exchange__section--left grid'>

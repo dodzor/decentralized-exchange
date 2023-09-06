@@ -56,7 +56,6 @@ async function main() {
     transaction = await exchange.connect(account1).makeOrder(dext.address, tokens(10), mETH.address, tokens(1));
     result = await transaction.wait();
     console.log(`Made order from ${account1.address} to ${exchange.address}\n`);
-    console.log(result);
 
     orderId = result.events[0].args.id;
     transaction = await exchange.connect(account1).cancelOrder(orderId);

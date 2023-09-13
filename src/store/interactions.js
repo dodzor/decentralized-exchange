@@ -40,6 +40,10 @@ export const loadTokens = async ( provider, addresses, dispatch ) => {
     symbol = await token.symbol();
     dispatch({ type: 'TOKEN_2_LOADED', token, symbol });
 
+    // token = new ethers.Contract(addresses[2], TOKEN_ABI, provider);
+    // symbol = await token.symbol();
+    // dispatch({ type: 'TOKEN_3_LOADED', token, symbol });
+
     return token;
 };
 

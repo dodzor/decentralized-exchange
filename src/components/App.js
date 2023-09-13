@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { loadNetwork, loadProvider, loadAccount, loadTokens, loadExchange } from '../store/interactions';
 import config from '../config';
 import Navbar from './Navbar';
+import Markets from './Markets';
 
 function App() {
 
@@ -24,12 +25,14 @@ function App() {
     });
     
     const dext = config[chainId].DEXT;
-    const meth = config[chainId].mETH;
+    // const meth = config[chainId].mETH;
+    const pir = config[chainId].PIR;
+
     const exchange = config[chainId].exchange;
 
-    await loadTokens(provider, [dext.address, meth.address], dispatch);
+    if (config[chainId]) await loadTokens(provider, [dext.address, pir.address], dispatch);
 
-    await loadExchange(provider, exchange.address, dispatch);
+    if (exchange) await loadExchange(provider, exchange.address, dispatch);
   }
 
   useEffect(() => {
@@ -44,7 +47,7 @@ function App() {
       <main className='exchange grid'>
         <section className='exchange__section--left grid'>
 
-          {/* Markets */}
+          <Markets/>
 
           {/* Balance */}
 

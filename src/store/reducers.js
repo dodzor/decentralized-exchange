@@ -47,6 +47,14 @@ export const tokens = (state = DEFAULT_TOKENS_STATE, action) => {
                 contracts: [...state.contracts, action.token], // expand contracts array with new token contract
                 symbols: [...state.symbols, action.symbol] //expand symbols array with new token symbol
             }
+        // case 'TOKEN_3_LOADED':
+        //     return {
+        //         ...state,
+        //         loaded: true,
+        //         contracts: [...state.contracts, action.token], // expand contracts array with new token contract
+        //         symbols: [...state.symbols, action.symbol] //expand symbols array with new token symbol
+        //     }
+        
         default:
             return state;
     }

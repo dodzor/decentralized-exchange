@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import Blockies from 'react-blockies';
 
-import config from '../config';
+import config from '../config.json';
 import { loadAccount } from '../store/interactions';
 import pirate from '../assets/piratebit-nobg.png';
 import eth from '../assets/eth.svg';

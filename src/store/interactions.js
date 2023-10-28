@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import TOKEN_ABI from '../abi/Token.json';
 import EXCHANGE_ABI from '../abi/Exchange.json';
+import { exchange } from './reducers';
 
 export const loadProvider = (dispatch) => {
     const connection = new ethers.providers.Web3Provider(window.ethereum);
@@ -52,4 +53,19 @@ export const loadExchange = async (provider, address, dispatch) => {
     dispatch({ type: 'EXCHANGE_LOADED', exchange });
 
     return exchange;
+}
+
+export const loadBalances = async (exchange, tokens, account, dispatch) => {
+    console.log(tokens);
+    let balance = ethers.utils.formatUnits(await tokens[0].balanceOf(account), 18);
+    dispatch({ type: 'TOKEN_1_BALANCE_LOADED', balance })
+
+    balance = ethers.utils.formatUnits(await exchange.balanceOf(tokens[0].address, account), 18)
+    dispatch({ type: 'EXCHANGE_1_BALANCE_LOADED', balance });
+
+    balance = ethers.utils.formatUnits(await tokens[1].balanceOf(account), 18);
+    dispatch({ type: 'TOKEN_2_BALANCE_LOADED', balance })
+
+    balance = ethers.utils.formatUnits(await exchange.balanceOf(tokens[1].address, account), 18)
+    dispatch({ type: 'EXCHANGE_2_BALANCE_LOADED', balance });
 }

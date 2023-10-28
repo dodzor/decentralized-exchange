@@ -5,6 +5,7 @@ import { loadNetwork, loadProvider, loadAccount, loadTokens, loadExchange } from
 import config from '../config';
 import Navbar from './Navbar';
 import Markets from './Markets';
+import Balance from './Balance';
 
 function App() {
 
@@ -49,7 +50,7 @@ function App() {
 
           <Markets/>
 
-          {/* Balance */}
+          <Balance/>
 
           {/* Order */}
 

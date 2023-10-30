@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import pirate from '../assets/piratebit-nobg.png';
 
 import { loadBalances } from '../store/interactions'; 
+import { transferTokens } from '../store/interactions';
 
 const Balance = () => {
     const [token1TransferAmmount, setToken1TransferAmmount] = useState(0)
@@ -14,19 +15,34 @@ const Balance = () => {
     const exchange = useSelector(state => state.exchange.contract);
     const exchangeBalances = useSelector(state => state.exchange.balances);
     const account = useSelector(state => state.provider.account);
+    const provider = useSelector(state => state.provider.connection);
+    const transferInProgress = useSelector(state => state.exchange.transferInProgress);
 
     const dispatch = useDispatch();
     
     useEffect(() => {
       if (tokens[0] && tokens[1] && exchange && account)
         loadBalances(exchange, tokens, account, dispatch);
-    }, [tokens, exchange, account]) // run effect only when dependencies change
+    }, [tokens, exchange, account, transferInProgress]) // run effect only when dependencies change
 
     const ammountHandler = (e, token) => {
       if (token.address === tokens[0].address) {
         setToken1TransferAmmount(e.target.value);
       }
-      console.log({token1TransferAmmount});
+    }
+
+    // Step 1: do tranfer;
+    // Step 2: Notify app that the tranfer is pending
+    // Step 3: Get confirmation from blockchain that transfer was successful
+    // Step 4: Notify app that transfer was successful
+    // Step 5: Handle transfer fails - notify app
+
+    const submitHandler = (e, token) => {
+      e.preventDefault();
+      
+      if (token.address === tokens[0].address) {
+        transferTokens(provider, exchange, 'deposit', token, token1TransferAmmount, dispatch);
+      }
     }
 
     return (
@@ -48,12 +64,12 @@ const Balance = () => {
             <p><small>Exchange</small>{exchangeBalances && exchangeBalances[0]}</p>
           </div>
   
-          <form>
+          <form onSubmit={(e) => submitHandler(e, tokens[0])}>
             <label htmlFor="token0"></label>
             <input type="text" id='token0' placeholder='0.0000' onChange={(e) => ammountHandler(e, tokens[0])}/>
   
             <button className='button' type='submit'>
-              <span></span>
+              <span>Deposit</span>
             </button>
           </form>
         </div>

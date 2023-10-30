@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { loadNetwork, loadProvider, loadAccount, loadTokens, loadExchange } from '../store/interactions';
+import { loadNetwork, loadProvider, loadAccount, loadTokens, loadExchange, subscribeToEvents } from '../store/interactions';
 import config from '../config';
 import Navbar from './Navbar';
 import Markets from './Markets';
@@ -29,11 +29,13 @@ function App() {
     // const meth = config[chainId].mETH;
     const pir = config[chainId].PIR;
 
-    const exchange = config[chainId].exchange;
-
     if (config[chainId]) await loadTokens(provider, [dext.address, pir.address], dispatch);
 
-    if (exchange) await loadExchange(provider, exchange.address, dispatch);
+    const exchangeCfg = config[chainId].exchange;
+    if (exchangeCfg) {
+      const exchange = await loadExchange(provider, exchangeCfg.address, dispatch);
+      subscribeToEvents(exchange, dispatch);
+    }
   }
 
   useEffect(() => {

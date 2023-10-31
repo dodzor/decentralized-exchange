@@ -4,7 +4,7 @@ import Blockies from 'react-blockies';
 
 import config from '../config.json';
 import { loadAccount } from '../store/interactions';
-import pirate from '../assets/piratebit-nobg.png';
+import pirate from '../assets/pir.png';
 import eth from '../assets/eth.svg';
 
 const Navbar = () => {

@@ -26,10 +26,11 @@ function App() {
     });
     
     const dext = config[chainId].DEXT;
-    // const meth = config[chainId].mETH;
     const pir = config[chainId].PIR;
 
-    if (config[chainId]) await loadTokens(provider, [dext.address, pir.address], dispatch);
+    if (config[chainId]) {
+      await loadTokens(provider, [dext.address, pir.address], ['dext', 'pir'], dispatch);
+    }
 
     const exchangeCfg = config[chainId].exchange;
     if (exchangeCfg) {

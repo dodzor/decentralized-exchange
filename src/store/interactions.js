@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import TOKEN_ABI from '../abi/Token.json';
 import EXCHANGE_ABI from '../abi/Exchange.json';
+import { lowerCase } from 'lodash';
 
 export const loadProvider = (dispatch) => {
     const connection = new ethers.providers.Web3Provider(window.ethereum);
@@ -29,16 +30,18 @@ export const loadAccount = async (dispatch, provider) => {
     return account;
 };
 
-export const loadTokens = async ( provider, addresses, dispatch ) => {   
+export const loadTokens = async ( provider, addresses, logos, dispatch ) => {   
     let token, symbol;
+    const logo1 = lowerCase(logos[0]).replace(/\s+/g, '');
+    const logo2 = lowerCase(logos[1]).replace(/\s+/g, '');
     
     token = new ethers.Contract(addresses[0], TOKEN_ABI, provider);
     symbol = await token.symbol();
-    dispatch({ type: 'TOKEN_1_LOADED', token, symbol });
+    dispatch({ type: 'TOKEN_1_LOADED', token, symbol, logo1 });
 
     token = new ethers.Contract(addresses[1], TOKEN_ABI, provider);
     symbol = await token.symbol();
-    dispatch({ type: 'TOKEN_2_LOADED', token, symbol });
+    dispatch({ type: 'TOKEN_2_LOADED', token, symbol, logo2 });
 
     return token;
 };

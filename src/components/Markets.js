@@ -4,15 +4,18 @@ import { loadTokens } from "../store/interactions";
 
 const Markets = () => {
     const chainId = useSelector(state => state.provider.chainId);
-    const dext = useSelector(state => state.tokens.symbols[0]);
-    const pir =  useSelector(state => state.tokens.symbols[1]);
-    const meth = useSelector(state => state.tokens.symbols[2]);
     const provider = useSelector(state => state.provider.connection);
 
     const dispatch = useDispatch();
 
     const marketHandler = async (e) => {
-      loadTokens(provider, e.target.value.split(','), dispatch);
+      const selectedOption = e.target.options[e.target.selectedIndex];
+      const selectedOptionText = selectedOption.text;
+
+      const addresses = e.target.value.split(',');
+      const texts = selectedOptionText.split('/');
+    
+      loadTokens(provider, addresses, texts, dispatch);
     }
 
     return(

@@ -28,7 +28,8 @@ export const provider = (state = {}, action) => {
 const DEFAULT_TOKENS_STATE = {
     loaded: false,
     contracts: [],
-    symbols: []
+    symbols: [],
+    logos: []
 };
 
 export const tokens = (state = DEFAULT_TOKENS_STATE, action) => {
@@ -38,7 +39,8 @@ export const tokens = (state = DEFAULT_TOKENS_STATE, action) => {
                 ...state,
                 loaded: true,
                 contracts: [action.token], // add token contract to contracts array
-                symbols: [action.symbol] // add token symbol to symbols array
+                symbols: [action.symbol], // add token symbol to symbols array
+                logos: [action.logo1]
             }
 
         case 'TOKEN_1_BALANCE_LOADED':
@@ -52,7 +54,8 @@ export const tokens = (state = DEFAULT_TOKENS_STATE, action) => {
                 ...state,
                 loaded: true,
                 contracts: [...state.contracts, action.token], // expand contracts array with new token contract
-                symbols: [...state.symbols, action.symbol] //expand symbols array with new token symbol
+                symbols: [...state.symbols, action.symbol], //expand symbols array with new token symbol
+                logos: [...state.logos, action.logo2]
             }
 
         case 'TOKEN_2_BALANCE_LOADED':

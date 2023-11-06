@@ -10,7 +10,7 @@ const Balance = () => {
 
     const [logo1Image, setLogo1Image] = useState(null);
     const [logo2Image, setLogo2Image] = useState(null);
-    const [isDeposit, setIsDeposit] = useState(null);
+    const [isDeposit, setIsDeposit] = useState(true);
 
     const tokens = useSelector(state => state.tokens.contracts);
     const tokenBalances = useSelector(state => state.tokens.balances);
@@ -79,6 +79,18 @@ const Balance = () => {
       }
     }
 
+    const withdrawHandler = (e, token) => {
+      e.preventDefault();
+
+      if (token.address === tokens[0].address) {
+        transferTokens(provider, exchange, 'withdraw', token, token1TransferAmmount, dispatch);
+        setToken1TransferAmmount(0);
+      } else {
+        transferTokens(provider, exchange, 'withdraw', token, token2TransferAmmount, dispatch);
+        setToken2TransferAmmount(0);
+      }
+    }
+
     const tabHandler = (e) => {
       if(e.target.className !== depositRef.current.className) {
         e.target.className = 'tab tab--active';
@@ -110,7 +122,7 @@ const Balance = () => {
             <p><small>Exchange</small>{exchangeBalances && exchangeBalances[0]}</p>
           </div>
   
-          <form onSubmit={(e) => submitHandler(e, tokens[0])}>
+          <form onSubmit={isDeposit ? (e) => submitHandler(e, tokens[0]) : (e) => withdrawHandler(e, tokens[0])}>
             <label htmlFor="token0"></label>
             <input type="text" 
                    id='token0'
@@ -135,7 +147,7 @@ const Balance = () => {
             <p><small>Exchange</small>{exchangeBalances && exchangeBalances[1]}</p>
           </div>
   
-          <form onSubmit={(e) => submitHandler(e, tokens[1])}>
+          <form onSubmit={isDeposit ? (e) => submitHandler(e, tokens[1]) : (e) => withdrawHandler(e, tokens[1])}>
             <label htmlFor="token1"></label>
             <input type="text" 
                    id='token1' 

@@ -72,7 +72,8 @@ export const tokens = (state = DEFAULT_TOKENS_STATE, action) => {
 const DEFAULT_EXCHANGE_STATE = { 
     loaded: false, 
     contract: {},
-    events: []
+    events: [],
+    orders: []
 }
 
 export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
@@ -128,7 +129,43 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
                     isSuccessful: false,
                     isError: true
                 },
+                transferInProgress: false
+            }
+
+        case 'ORDER_REQUEST':
+            return {
+                ...state,
+                transaction: {
+                    transactionType: 'New Order',
+                    isPending: true,
+                    isSuccessful: false,
+                },
+                transferInProgress: true
+            }
+
+        case 'ORDER_FAIL': 
+            return {
+                ...state,
+                transaction: {
+                    transactionType: 'New Order',
+                    isPending: false,
+                    isSuccessful: false,
+                    isError: true
+                },
+                transferInProgress: false
+            }
+
+        case 'ORDER_SUCCESS':
+            return {
+                ...state,
+                transaction: {
+                    transactionType: 'New Order',
+                    isPending: false,
+                    isSuccessful: true
+                },
                 transferInProgress: false,
+                events: [...state.events, action.event],
+                orders: [...state.orders, action.order]
             }
                 
         default:

@@ -123,3 +123,21 @@ export const makeBuyOrder = async (provider, exchange, tokens, order, dispatch) 
         dispatch({ type: 'ORDER_FAIL' });
     }
 }
+
+export const makeSellOrder = async (provider, exchange, tokens, order, dispatch) => {
+    const tokenGet = tokens[1].address;
+    const amountGet = ethers.utils.parseUnits((order.amount * order.price).toString(), 18);
+    const tokenGive = tokens[0].address;
+    const amountGive = ethers.utils.parseUnits(order.amount, 18);
+
+    dispatch({ type: 'ORDER_REQUEST' });
+
+    try {
+        const signer = await provider.getSigner();
+        const transaction = await exchange.connect(signer).makeOrder(tokenGet, amountGet, tokenGive, amountGive);
+        transaction.wait();
+    } catch (error) {
+        console.log(error);
+        dispatch({ type: 'ORDER_FAIL' });
+    }
+}

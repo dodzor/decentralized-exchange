@@ -73,7 +73,7 @@ const DEFAULT_EXCHANGE_STATE = {
     loaded: false, 
     contract: {},
     events: [],
-    orders: []
+    allOrders: {data: []}
 }
 
 export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
@@ -156,6 +156,16 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
             }
 
         case 'ORDER_SUCCESS':
+            //prevent duplicate orders
+            const index = state.allOrders.data.findIndex(order => order.id === action.order.id);
+
+            let data;
+            if (index === -1) {
+                data = [...state.allOrders.data, action.order];
+            } else {
+                data = state.allOrders.data;
+            }
+
             return {
                 ...state,
                 transaction: {
@@ -165,7 +175,10 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
                 },
                 transferInProgress: false,
                 events: [...state.events, action.event],
-                orders: [...state.orders, action.order]
+                allOrders: {
+                    ...state.allOrders,
+                    data
+                }
             }
                 
         default:

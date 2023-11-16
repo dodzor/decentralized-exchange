@@ -141,3 +141,13 @@ export const makeSellOrder = async (provider, exchange, tokens, order, dispatch)
         dispatch({ type: 'ORDER_FAIL' });
     }
 }
+
+
+export const loadAllOrders = async (provider, exchange, dispatch) => {
+    const block = await provider.getBlockNumber();
+
+    const orderStream = await exchange.queryFilter('Order', 0, block);
+    const allOrders = orderStream.map(event => event.args);
+
+    dispatch({ type: 'ALL_ORDERS_LOADED', allOrders });
+}

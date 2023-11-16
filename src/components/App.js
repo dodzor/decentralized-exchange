@@ -1,12 +1,22 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { loadNetwork, loadProvider, loadAccount, loadTokens, loadExchange, subscribeToEvents } from '../store/interactions';
+import { 
+  loadNetwork,
+  loadProvider, 
+  loadAccount, 
+  loadTokens, 
+  loadExchange, 
+  subscribeToEvents,
+  loadAllOrders 
+} from '../store/interactions';
+
 import config from '../config';
 import Navbar from './Navbar';
 import Markets from './Markets';
 import Balance from './Balance';
 import Order from './Order';
+import OrderBook from './OrderBook';
 
 function App() {
 
@@ -36,6 +46,9 @@ function App() {
     const exchangeCfg = config[chainId].exchange;
     if (exchangeCfg) {
       const exchange = await loadExchange(provider, exchangeCfg.address, dispatch);
+
+      loadAllOrders(provider, exchange, dispatch);
+
       subscribeToEvents(exchange, dispatch);
     }
   }
@@ -67,7 +80,7 @@ function App() {
 
           {/* Trades */}
 
-          {/* OrderBook */}
+          <OrderBook/>
 
         </section>
       </main>

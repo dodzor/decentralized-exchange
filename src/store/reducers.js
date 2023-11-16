@@ -157,7 +157,7 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
 
         case 'ORDER_SUCCESS':
             //prevent duplicate orders
-            const index = state.allOrders.data.findIndex(order => order.id === action.order.id);
+            const index = state.allOrders.data.findIndex(order => order.id.toString() === action.order.id.toString());
 
             let data;
             if (index === -1) {
@@ -180,6 +180,16 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
                     data
                 }
             }
+
+        case 'ALL_ORDERS_LOADED': 
+            return {
+                ...state,
+                allOrders: {
+                    loaded: true,
+                    data: action.allOrders
+                }
+            }
+            
                 
         default:
             return state;

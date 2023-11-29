@@ -31,6 +31,8 @@ const Order = () => {
 
     const buyHandler = (e) => {
         e.preventDefault();
+        console.log('price:' + price);
+        console.log('amount:' + amount);
         makeBuyOrder(provider, exchange, tokens, { amount, price }, dispatch)
         setAmount(0);
         setPrice(0);
@@ -54,29 +56,30 @@ const Order = () => {
         </div>
   
         <form onSubmit={isBuy ? buyHandler : sellHandler}>
-          {isBuy ? (
-            <label htmlFor="amount">Buy amount</label>
-          ): (
-            <label htmlFor="amount">Sell amount</label>
-          )}
-          <input 
-            type="text" 
-            id='amount' 
-            placeholder='0.0000'
-            value={amount === 0 ? '' : amount} 
-            onChange={(e) => setAmount(e.target.value)}/>
+           {isBuy ? (
+              <label htmlFor="price">Buy price</label>
+            ): (
+              <label htmlFor="price">Sell price</label>
+            )}
+            <input 
+              type="text" 
+              id='price' 
+              placeholder='0.0000'
+              value={price === 0 ? '': price} 
+              onChange={(e) => setPrice(e.target.value)}/>
+
+            {isBuy ? (
+              <label htmlFor="amount">Buy amount</label>
+            ): (
+              <label htmlFor="amount">Sell amount</label>
+            )}
+            <input 
+              type="text" 
+              id='amount' 
+              placeholder='0.0000'
+              value={amount === 0 ? '' : amount} 
+              onChange={(e) => setAmount(e.target.value)}/>
           
-          {isBuy ? (
-            <label htmlFor="price">Buy price</label>
-          ): (
-            <label htmlFor="price">Sell price</label>
-          )}
-          <input 
-            type="text" 
-            id='price' 
-            placeholder='0.0000'
-            value={price === 0 ? '': price} 
-            onChange={(e) => setPrice(e.target.value)}/>
           <button className='button button--filled' type='submit'>
             {isBuy ? (
               <span>Buy Order</span>

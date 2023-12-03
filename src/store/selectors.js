@@ -1,11 +1,27 @@
 import { createSelector } from "reselect";
 import { useSelector } from "react-redux";
-import { get, groupBy } from 'lodash';
+import { get, groupBy, reject } from 'lodash';
 import { ethers } from 'ethers';
 import moment  from 'moment';
 
-const tokensSelector = state => get(state, 'tokens.contracts')
-const allOrdersSelector = state => get(state, 'exchange.allOrders.data', [])
+const tokensSelector = state => get(state, 'tokens.contracts');
+const allOrdersSelector = state => get(state, 'exchange.allOrders.data', []);
+const filledOrdersSelector = state => get(state, 'exchange.filledOrders.data', []);
+const canceledOrdersSelector = state => get(state, 'exchange.canceledOrders.data', []);
+
+const openOrdersSelector = state => {
+    const all = allOrdersSelector(state);
+    const filled = filledOrdersSelector(state);
+    const cancelled = canceledOrdersSelector(state);
+
+    const openOrders = reject(all, (order) => {
+        const orderFilled = filled.some((o) => o.id.toString() === order.id.toString());
+        const orderCanceled = cancelled.some((o) => o.id.toString() === order.id.toString());
+        return(orderFilled || orderCanceled);
+    })
+
+    return openOrders;
+}
 
 const GREEN = '#25CE8F';
 const RED = '#F45353';
@@ -41,7 +57,7 @@ const decorateOrder = (order, tokens) => {
 // orders and tokens are the result of calling allOrdersSelector and tokensSelector
 // resultFunc is called only if orders or tokens change
 export const orderBookSelector = createSelector(
-    allOrdersSelector, 
+    openOrdersSelector, 
     tokensSelector, 
     (orders, tokens) => {
 
@@ -66,6 +82,8 @@ export const orderBookSelector = createSelector(
             ...orders,
             sellOrders: sellOrders.sort((a, b) => b.tokenPrice - a.tokenPrice) 
         }
+
+        return orders;
     }
 );
 

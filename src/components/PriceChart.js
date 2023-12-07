@@ -10,6 +10,7 @@ const PriceChart = () => {
     const account = useSelector(state => state.provider.account);
     const symbols = useSelector(state => state.tokens.symbols);
     const priceChart = useSelector(priceChartSelector);
+    console.log(priceChart);
 
     return (
       <div className="component exchange__chart">
@@ -32,7 +33,7 @@ const PriceChart = () => {
             <Chart
                 type="candlestick"
                 options={options}
-                series={series}
+                series={priceChart ? priceChart.series : series}
                 width="100%"
                 height="100%"
             />

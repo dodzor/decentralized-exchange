@@ -1,7 +1,9 @@
 import { createSelector } from "reselect";
 import { useSelector } from "react-redux";
-import { get, groupBy, reject } from 'lodash';
+import { get, groupBy, reject, minBy, maxBy } from 'lodash';
 import { ethers } from 'ethers';
+import { series } from '../components/PriceChart.conf';
+
 import moment  from 'moment';
 
 const tokensSelector = state => get(state, 'tokens.contracts');
@@ -46,7 +48,7 @@ const decorateOrder = (order, tokens) => {
         token0Amount,
         token1Amount,
         tokenPrice,
-        formatedTimeStamp: moment.unix(order.timestamp).format('h:mm:ssa d MMM Y')
+        formattedTimestamp: moment.unix(order.timestamp).format('h:mm:ssa d MMM Y')
     })
 }
 
@@ -112,11 +114,52 @@ export const priceChartSelector = createSelector(
     (orders, tokens) => {
         if (!tokens[0] || !tokens[1]) { return; }
 
-        console.log(orders);
+        orders = orders.filter((o) => o.tokenGet === tokens[0].address || o.tokenGet === tokens[1].address);
+        orders = orders.filter((o) => o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address);
+        // console.log(orders);
 
-        orders = orders.filter(o => o.tokenGet === tokens[0].address || o.tokenGet === tokens[1].address);
-        orders = orders.filter(o => o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address);
+        // sort orders by date ascending to compare hystory
+        orders = orders.sort((a, b) => a.timestamp - b.timestamp);
+        // console.log(orders);
 
-        console.log(orders);
+        orders = orders.map((o) => decorateOrder(o, tokens));
+
+        return({
+            series: [{
+                data: buildGraphData(orders)
+            }]
+        })
     }
 )
+
+const buildGraphData = (orders) => {
+    // Group orders by hour for the graph
+    orders = groupBy(orders, (o) => moment.unix(o.timestamp).startOf('hour').format());
+
+    // if (!orders.length) {
+    //     console.log(series);    
+    //     return series;
+    // }
+
+    const hours = Object.keys(orders);
+    // console.log(hours.length);
+    // if (!hours.length) {
+    //     return series;
+    // }
+    const graphData = hours.map((hour) => {
+        // Get orders for current hour
+        const group = orders[hour];
+
+        const open = group[0];
+        const high = maxBy(group, 'tokenPrice');
+        const low = minBy(group, 'tokenPrice');
+        const close = group[group.length - 1];
+
+        return({
+            x: new Date(hour),
+            y: [open.tokenPrice, high.tokenPrice, low.tokenPrice, close.tokenPrice]
+        });
+    })
+
+    return graphData;
+}

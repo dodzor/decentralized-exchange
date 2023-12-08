@@ -76,7 +76,7 @@ export const options = {
   
   // Code in the series as a temporary placeholder for demonstration
   
-  export const series = [
+  export const defaultSeries = [
     {
       data: [
         [24.01, [6593.34, 6600, 6582.63, 6600]],
@@ -95,4 +95,3 @@ export const options = {
       ]
     }
   ]
-  

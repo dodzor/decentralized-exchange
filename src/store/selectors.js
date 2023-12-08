@@ -2,9 +2,9 @@ import { createSelector } from "reselect";
 import { useSelector } from "react-redux";
 import { get, groupBy, reject, minBy, maxBy } from 'lodash';
 import { ethers } from 'ethers';
-import { series } from '../components/PriceChart.conf';
+import { defaultSeries } from '../components/PriceChart.conf';
 
-import moment  from 'moment';
+import moment from 'moment';
 
 const tokensSelector = state => get(state, 'tokens.contracts');
 const allOrdersSelector = state => get(state, 'exchange.allOrders.data', []);
@@ -124,28 +124,31 @@ export const priceChartSelector = createSelector(
 
         orders = orders.map((o) => decorateOrder(o, tokens));
 
-        return({
-            series: [{
-                data: buildGraphData(orders)
-            }]
-        })
+        let secondLastOrder, lastOrder;
+        [secondLastOrder, lastOrder] = orders.slice(orders.length - 2, orders.length);
+        const secondLastPrice = get(secondLastOrder, 'tokenPrice', 0)
+        const lastPrice = get(lastOrder, 'tokenPrice', 0)
+
+        return {
+            ...buildGraphData(orders),
+            lastPrice,
+            lastPriceChange: (lastPrice >= secondLastPrice ? '+' : '-')
+        };
     }
 )
 
 const buildGraphData = (orders) => {
+
+
     // Group orders by hour for the graph
     orders = groupBy(orders, (o) => moment.unix(o.timestamp).startOf('hour').format());
 
-    // if (!orders.length) {
-    //     console.log(series);    
-    //     return series;
-    // }
-
     const hours = Object.keys(orders);
-    // console.log(hours.length);
-    // if (!hours.length) {
-    //     return series;
-    // }
+
+    if (!hours.length) {
+        return defaultSeries;
+    }
+
     const graphData = hours.map((hour) => {
         // Get orders for current hour
         const group = orders[hour];
@@ -161,5 +164,9 @@ const buildGraphData = (orders) => {
         });
     })
 
-    return graphData;
+    return({
+        series: [{
+            data: graphData
+        }]
+    })
 }

@@ -86,7 +86,7 @@ async function main() {
 
     await wait(1);
 
-    transaction = await exchange.connect(account1).makeOrder(dext.address, tokens(100), mETH.address, tokens(7));
+    transaction = await exchange.connect(account1).makeOrder(dext.address, tokens(100), mETH.address, tokens(6));
     result = await transaction.wait();
     console.log(`Made order from ${account1.address} to ${exchange.address}\n`);
 
@@ -109,7 +109,7 @@ async function main() {
     await wait(1);
 
     for (let i = 1; i <= 10; i++) {
-        transaction = await exchange.connect(account1).makeOrder(dext.address, tokens(10 * i), mETH.address, tokens(i));
+        transaction = await exchange.connect(account1).makeOrder(dext.address, tokens(10 * i), mETH.address, tokens(10));
         result = await transaction.wait();
 
         console.log(`Made order from ${account1.address} to ${exchange.address}\n`);
@@ -117,7 +117,7 @@ async function main() {
     }
 
     for (let i = 1; i <= 10; i++) {
-        transaction = await exchange.connect(account2).makeOrder(mETH.address, tokens(i), dext.address, tokens(10 * i));
+        transaction = await exchange.connect(account2).makeOrder(mETH.address, tokens(10), dext.address, tokens(10 * i));
         result = await transaction.wait();
 
         console.log(`Made order from ${account2.address} to ${exchange.address}\n`);

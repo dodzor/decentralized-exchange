@@ -10,6 +10,7 @@ const tokensSelector = state => get(state, 'tokens.contracts');
 const allOrdersSelector = state => get(state, 'exchange.allOrders.data', []);
 const filledOrdersSelector = state => get(state, 'exchange.filledOrders.data', []);
 const canceledOrdersSelector = state => get(state, 'exchange.canceledOrders.data', []);
+const accountSelector = state => get(state, 'provider.account');
 
 const openOrdersSelector = state => {
     const all = allOrdersSelector(state);
@@ -48,7 +49,7 @@ const decorateOrder = (order, tokens) => {
         token0Amount,
         token1Amount,
         tokenPrice,
-        formattedTimestamp: moment.unix(order.timestamp).format('h:mm:ssa d MMM Y')
+        formattedTimestamp: moment.unix(order.timestamp).format('h:mm:ssa D MMM Y')
     })
 }
 
@@ -136,7 +137,6 @@ export const priceChartSelector = createSelector(
     }
 );
 
-
 export const tradesSelector = createSelector(
     filledOrdersSelector,
     tokensSelector,
@@ -158,6 +158,45 @@ export const tradesSelector = createSelector(
         return orders;
     }
 );
+
+export const myOpenOrdersSelector = createSelector(
+    openOrdersSelector,
+    tokensSelector,
+    accountSelector,
+    (orders, tokens, account) => {        
+        if (!tokens[0] || !tokens[1]) { return; }
+     
+        orders = orders.filter((o) => o.user === account)
+     
+        orders = orders.filter((o) => o.tokenGet === tokens[0].address || o.tokenGet === tokens[1].address);
+        orders = orders.filter((o) => o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address);
+        
+        orders = decorateMyOpenOrders(orders, tokens);
+
+        orders = orders.sort((a, b) => b.timestamp - a.timestamp);
+        return orders;
+    }
+);
+
+const decorateMyOpenOrders = (orders, tokens) => {
+    orders = orders.map((order) => {
+        order = decorateOrder(order, tokens);
+        order = decorateMyOpenOrder(order, tokens);
+        return order;
+    });
+
+    return orders;
+}
+
+const decorateMyOpenOrder = (order, tokens) => {
+    const orderType = order.tokenGet === tokens[0].address ? 'buy' : 'sell';
+
+    return {
+        ...order,
+        orderType,
+        orderTypeClass: orderType === 'buy' ? GREEN : RED
+    };
+}
 
 const decorateFilledOrders = (orders, tokens) => {
     let previousOrder = orders[0];

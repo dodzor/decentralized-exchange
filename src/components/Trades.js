@@ -8,7 +8,6 @@ import Banner from "./Banner";
 const Trades = () => {
     const symbols = useSelector(state => state.tokens.symbols);
     const filledOrders = useSelector(tradesSelector);
-    console.log(filledOrders);
 
     return (
       <div className="component exchange__trades">

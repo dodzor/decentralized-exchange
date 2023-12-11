@@ -120,7 +120,6 @@ export const priceChartSelector = createSelector(
 
         // sort orders by date ascending to compare hystory
         orders = orders.sort((a, b) => a.timestamp - b.timestamp);
-        // console.log(orders);
 
         orders = orders.map((o) => decorateOrder(o, tokens));
 
@@ -178,13 +177,41 @@ export const myOpenOrdersSelector = createSelector(
     }
 );
 
-const decorateMyOpenOrders = (orders, tokens) => {
+export const myTradesSelector = createSelector(
+    filledOrdersSelector,
+    tokensSelector,
+    accountSelector,
+    (orders, tokens, account) => {
+        if (!tokens[0] || !tokens[1]) { return; }
+
+        orders = orders.filter((o) => o.user === account || o.creator === account);
+
+        orders = orders.filter((o) => o.tokenGet === tokens[0].address || o.tokenGet === tokens[1].address);
+        orders = orders.filter((o) => o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address);
+
+        orders = orders.sort((a, b) => b.timestamp - a.timestamp);
+
+        orders = decorateMyTrades(orders, tokens, account);
+        return orders;
+    }
+);
+
+const decorateMyOpenOrders = (orders, tokens, account) => {
     orders = orders.map((order) => {
         order = decorateOrder(order, tokens);
         order = decorateMyOpenOrder(order, tokens);
         return order;
     });
 
+    return orders;
+}
+
+const decorateMyTrades = (orders, tokens, account) => {
+    orders = orders.map((order) => {
+        order = decorateOrder(order, tokens);
+        order = decorateMyTrade(order, tokens, account);
+        return order;
+    })
     return orders;
 }
 
@@ -195,6 +222,25 @@ const decorateMyOpenOrder = (order, tokens) => {
         ...order,
         orderType,
         orderTypeClass: orderType === 'buy' ? GREEN : RED
+    };
+}
+
+const decorateMyTrade = (order, tokens, account) => {
+    const myOrder = order.creator === account;
+
+    // debugger
+    let orderType;
+    if (myOrder) {
+        orderType = order.tokenGive = tokens[1].address ? 'buy' : 'sell';
+    } else {
+        orderType = order.tokenGive = tokens[1].address ? 'sell' : 'buy';
+    }
+
+    return {
+        ...order,
+        orderType,
+        orderClass: orderType === 'buy' ? GREEN : RED,
+        orderSign: orderType === 'buy' ? '+' : '-'
     };
 }
 

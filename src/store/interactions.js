@@ -55,17 +55,22 @@ export const loadExchange = async (provider, address, dispatch) => {
 
 export const subscribeToEvents = (exchange, dispatch) => {
     exchange.on('Deposit', (token, user, amount, balance, event) => {
-        dispatch({ type: 'TRANSFER_SUCCESS', event })
-    })
+        dispatch({ type: 'TRANSFER_SUCCESS', event });
+    });
 
     exchange.on('Withdraw', (token, user, amount, balance, event) => {
-        dispatch({ type: 'TRANSFER_SUCCESS', event })
-    })
+        dispatch({ type: 'TRANSFER_SUCCESS', event });
+    });
 
     exchange.on('Order', (id, user, tokenGet, amountGet, tokenGive, amountGive, timestamp, event) => {
         const order = event.args;
-        dispatch({ type: 'ORDER_SUCCESS', event, order })
-    })
+        dispatch({ type: 'ORDER_SUCCESS', event, order });
+    });
+
+    exchange.on('Cancel', (id, tokenGet, amountGet, tokenGive, amountGive, user, timestamp, event) => {
+        const order = event.args;
+        dispatch({ type: 'ORDER_CANCEL_SUCCESS', event, order });
+    });
 }
 
 export const loadBalances = async (exchange, tokens, account, dispatch) => {
@@ -158,4 +163,17 @@ export const loadAllOrders = async (provider, exchange, dispatch) => {
     const allOrders = orderStream.map(event => event.args);
 
     dispatch({ type: 'ALL_ORDERS_LOADED', allOrders });
+}
+
+export const cancelOrder = async (provider, exchange, order, dispatch) => {
+    dispatch({ type: 'ORDER_CANCEL_REQUEST' });
+
+    try {
+        const signer = await provider.getSigner();
+        const transaction = await exchange.connect(signer).cancelOrder(order.id);
+        transaction.wait();
+    } catch (err) {
+        console.log(err);
+        dispatch({ type: 'ORDER_CANCEL_FAIL' });
+    }
 }

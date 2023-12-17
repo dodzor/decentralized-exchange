@@ -26,12 +26,12 @@ contract Exchange {
                 uint256 timestamp);
 
     event Cancel(uint256 id, 
-            address user, 
-            address tokenGet, 
-            uint256 amountGet, 
-            address tokenGive, 
-            uint256 amountGive, 
-            uint256 timestamp);
+                 address user, 
+                 address tokenGet, 
+                 uint256 amountGet, 
+                 address tokenGive, 
+                 uint256 amountGive, 
+                 uint256 timestamp);
 
     event Trade(uint256 id,
                 address user,

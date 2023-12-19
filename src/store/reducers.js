@@ -73,10 +73,14 @@ const DEFAULT_EXCHANGE_STATE = {
     loaded: false, 
     contract: {},
     events: [],
-    allOrders: {data: []}
+    allOrders: { data: [] },
+    canceledOrders: { data: [] },
+    filledOrders: { data: [] }
 }
 
 export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
+    let index, data;
+
     switch (action.type) {
         case 'EXCHANGE_LOADED':
             return {
@@ -157,9 +161,8 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
 
         case 'ORDER_SUCCESS':
             //prevent duplicate orders
-            const index = state.allOrders.data.findIndex(order => order.id.toString() === action.order.id.toString());
+            index = state.allOrders.data.findIndex(order => order.id.toString() === action.order.id.toString());
 
-            let data;
             if (index === -1) {
                 data = [...state.allOrders.data, action.order];
             } else {
@@ -216,7 +219,18 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
                     isPending: true,
                     isSuccessful: false
                 },
-                transferInProgress: false
+                transferInProgress: true
+            }
+
+        case 'ORDER_FILL_REQUEST':
+            return {
+                ...state,
+                transaction: {
+                    transactionType: 'Fill Order',
+                    isPending: true,
+                    isSuccessful: false
+                },
+                transferInProgress: true
             }
 
         case 'ORDER_CANCEL_SUCCESS':
@@ -238,11 +252,50 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
                 events: [...state.events, action.event]
             }
 
+        case 'ORDER_FILL_SUCCESS':
+            console.log(action.order);
+            console.log(state.filledOrders.data);
+            //prevent duplicate orders
+            let indexFilled = state.filledOrders.data.findIndex(order => order.id.toString() === action.order.id.toString());
+
+            if (indexFilled === -1) {
+                data = [...state.filledOrders.data, action.order];
+            } else {
+                data = state.filledOrders.data;
+            }
+
+            return {
+                ...state,
+                transaction: {
+                    transactionType: 'Fill Order',
+                    isPending: false,
+                    isSuccessful: true
+                },
+                transferInProgress: false,
+                events: [...state.events, action.event],
+                filledOrders: {
+                    ...state.filledOrders,
+                    data
+                }
+            }
+
         case 'ORDER_CANCEL_FAIL':
             return {
                 ...state,
                 transaction: {
                     transactionType: 'Cancel Order',
+                    isPending: false,
+                    isSuccessful: false,
+                    isError: true
+                },
+                transferInProgress: false
+            }
+
+        case 'ORDER_FILL_FAIL': 
+            return {
+                ...state,
+                transaction: {
+                    transactionType: 'Fill Order',
                     isPending: false,
                     isSuccessful: false,
                     isError: true

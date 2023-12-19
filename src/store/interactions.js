@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 import TOKEN_ABI from '../abi/Token.json';
 import EXCHANGE_ABI from '../abi/Exchange.json';
 import { lowerCase } from 'lodash';
+import { exchange } from './reducers';
 
 export const loadProvider = (dispatch) => {
     const connection = new ethers.providers.Web3Provider(window.ethereum);
@@ -70,6 +71,12 @@ export const subscribeToEvents = (exchange, dispatch) => {
     exchange.on('Cancel', (id, tokenGet, amountGet, tokenGive, amountGive, user, timestamp, event) => {
         const order = event.args;
         dispatch({ type: 'ORDER_CANCEL_SUCCESS', event, order });
+    });
+
+    exchange.on('Trade', (id, user, tokenGet, amountGet, tokenGive, amountGive, creator, timestamp, event) => {
+        const order = event.args;
+        console.log(order, event)
+        dispatch( { type: 'ORDER_FILL_SUCCESS', event, order });
     });
 }
 
@@ -173,7 +180,19 @@ export const cancelOrder = async (provider, exchange, order, dispatch) => {
         const transaction = await exchange.connect(signer).cancelOrder(order.id);
         transaction.wait();
     } catch (err) {
-        console.log(err);
         dispatch({ type: 'ORDER_CANCEL_FAIL' });
+    }
+}
+
+export const fillOrder = async (provider, exchange, order, dispatch) => {
+    dispatch({ type: 'ORDER_FILL_REQUEST' });
+
+    try {
+        const signer = await provider.getSigner();
+        const transaction = await exchange.connect(signer).fillOrder(order.id);
+        transaction.wait();
+    } catch (err) {
+        console.log(err);
+        dispatch({ type: 'ORDER_FILL_FAIL' });
     }
 }

@@ -79,7 +79,7 @@ function App() {
 
           <PriceChart/>
 
-          <Transactions/>
+          <Transactions />
 
           <Trades/>
 

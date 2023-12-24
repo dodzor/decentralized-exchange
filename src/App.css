@@ -591,7 +591,8 @@ table td {
 /* -- Alert -- */
 
 .alert {
-	background: #222D41;
+	/* background: #222D41; */
+	background: var(--clr-neutral);
 
 	height: 100px;
 	width: 300px;

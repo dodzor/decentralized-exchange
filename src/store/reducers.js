@@ -121,7 +121,7 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
                     isSuccessful: true
                 },
                 transferInProgress: false,
-                events: [...state.events, action.event]
+                events: [action.event, ...state.events]
             }
 
         case 'TRANSFER_FAIL':
@@ -177,7 +177,7 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
                     isSuccessful: true
                 },
                 transferInProgress: false,
-                events: [...state.events, action.event],
+                events: [action.event, ...state.events],
                 allOrders: {
                     ...state.allOrders,
                     data
@@ -249,12 +249,10 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
                         action.order
                     ]
                 },
-                events: [...state.events, action.event]
+                events: [action.event, ...state.events]
             }
 
         case 'ORDER_FILL_SUCCESS':
-            console.log(action.order);
-            console.log(state.filledOrders.data);
             //prevent duplicate orders
             let indexFilled = state.filledOrders.data.findIndex(order => order.id.toString() === action.order.id.toString());
 
@@ -272,7 +270,7 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
                     isSuccessful: true
                 },
                 transferInProgress: false,
-                events: [...state.events, action.event],
+                events: [action.event, ...state.events],
                 filledOrders: {
                     ...state.filledOrders,
                     data

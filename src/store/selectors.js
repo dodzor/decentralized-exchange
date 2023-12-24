@@ -11,6 +11,7 @@ const allOrdersSelector = state => get(state, 'exchange.allOrders.data', []);
 const filledOrdersSelector = state => get(state, 'exchange.filledOrders.data', []);
 const canceledOrdersSelector = state => get(state, 'exchange.canceledOrders.data', []);
 const accountSelector = state => get(state, 'provider.account');
+const eventsSelector = state => get(state, 'exchange.events');
 
 const openOrdersSelector = state => {
     const all = allOrdersSelector(state);
@@ -196,6 +197,17 @@ export const myTradesSelector = createSelector(
     }
 );
 
+export const myEventsSelector = createSelector(
+    eventsSelector,
+    accountSelector,
+    (events, account) => {
+        events = events.filter((event) => event.args.user === account);
+        console.log(events);
+        
+        return events;
+    }
+)
+
 const decorateMyOpenOrders = (orders, tokens, account) => {
     orders = orders.map((order) => {
         order = decorateOrder(order, tokens);
@@ -231,8 +243,10 @@ const decorateMyTrade = (order, tokens, account) => {
     // debugger
     let orderType;
     if (myOrder) {
+        console.log('my order..');
         orderType = order.tokenGive = tokens[1].address ? 'buy' : 'sell';
     } else {
+        console.log('not my order..');
         orderType = order.tokenGive = tokens[1].address ? 'sell' : 'buy';
     }
 

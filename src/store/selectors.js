@@ -1,5 +1,4 @@
 import { createSelector } from "reselect";
-import { useSelector } from "react-redux";
 import { get, groupBy, reject, minBy, maxBy } from 'lodash';
 import { ethers } from 'ethers';
 import { defaultSeries } from '../components/PriceChart.conf';
@@ -202,7 +201,6 @@ export const myEventsSelector = createSelector(
     accountSelector,
     (events, account) => {
         events = events.filter((event) => event.args.user === account);
-        console.log(events);
         
         return events;
     }
@@ -243,10 +241,8 @@ const decorateMyTrade = (order, tokens, account) => {
     // debugger
     let orderType;
     if (myOrder) {
-        console.log('my order..');
         orderType = order.tokenGive = tokens[1].address ? 'buy' : 'sell';
     } else {
-        console.log('not my order..');
         orderType = order.tokenGive = tokens[1].address ? 'sell' : 'buy';
     }
 

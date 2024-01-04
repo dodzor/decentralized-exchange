@@ -1,24 +1,25 @@
 import { useSelector } from "react-redux";
 import { useRef, useEffect } from "react";
 
+import config from "../config.json";
 import { myEventsSelector } from "../store/selectors";
 
 const Alert = () => {
     const alertRef = useRef(null);
     const isPending = useSelector(state => state.exchange.transaction && state.exchange.transaction.isPending);
-    const isSuccessful = useSelector(state => state.exchange.transaction && state.exchange.transaction.isSuccessful);
     const isError = useSelector(state => state.exchange.transaction && state.exchange.transaction.isError);
     const account = useSelector(state => state.provider.account);
+    const chainId = useSelector(state => state.provider.chainId);
     const myEvents = useSelector(myEventsSelector);
 
     useEffect(() => {
-        if (isPending && account) {
+        if ((isPending || isError || myEvents[0]) && account) {
             alertRef.current.className = "alert";
         }
-    }, [isPending, account]);
+    }, [myEvents, isPending, isError, account]);
 
     const removeHandler = (e) => {
-        alertRef.current.className = "alert--remove";
+        alertRef.current.className = "alert alert--remove";
     }
 
     return (
@@ -35,7 +36,7 @@ const Alert = () => {
           <div className="alert" ref={alertRef} onClick={removeHandler}>
             <h1>Transaction Successful</h1>
             <a
-                href=''
+                href={config[chainId] ? `${config[chainId].explorerUrl}/tx/${myEvents[0].transactionHash}` : '#'}
                 target='_blank'
                 rel='noreferrer'
             >
@@ -43,7 +44,7 @@ const Alert = () => {
             </a>
           </div>
         ) : (
-          <div className="alert alert--remove"></div>
+          <div className="alert alert--remove" onClick={removeHandler} ref={alertRef}></div>
         )}  
       </div>
     );

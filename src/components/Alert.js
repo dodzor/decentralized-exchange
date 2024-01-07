@@ -14,7 +14,9 @@ const Alert = () => {
 
     useEffect(() => {
         if ((isPending || isError || myEvents[0]) && account) {
-            alertRef.current.className = "alert";
+            if (alertRef) {
+              alertRef.current.className = "alert";
+            }
         }
     }, [myEvents, isPending, isError, account]);
 
@@ -45,7 +47,8 @@ const Alert = () => {
           </div>
         ) : (
           <div className="alert alert--remove" onClick={removeHandler} ref={alertRef}></div>
-        )}  
+        )} 
+    
       </div>
     );
   }

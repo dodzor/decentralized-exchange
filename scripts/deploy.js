@@ -9,7 +9,7 @@ async function main() {
   const Exchange = await hre.ethers.getContractFactory("Exchange");
 
   const accounts = await hre.ethers.getSigners();
-  console.log(`Accounts fetched:\n${accounts[0].address}, \n${accounts[1].address}, \n${accounts[2].address}`);
+  console.log(`Accounts fetched:\n${accounts[0].address}, \n${accounts[1].address}`);
 
   const dext = await Token.deploy('Decentralized Exchange Token', 'DEXT', tokens(1000000));
   await dext.deployed();

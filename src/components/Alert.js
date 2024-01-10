@@ -14,7 +14,7 @@ const Alert = () => {
 
     useEffect(() => {
         if ((isPending || isError || myEvents[0]) && account) {
-            if (alertRef) {
+            if (alertRef.current) {
               alertRef.current.className = "alert";
             }
         }
@@ -27,11 +27,11 @@ const Alert = () => {
     return (
       <div>
         {isPending ? (
-            <div className="alert alert--remove" ref={alertRef} onClick={removeHandler}>
+            <div className="alert" ref={alertRef} onClick={removeHandler}>
                 <h1>Transaction Pending...</h1>
             </div>
         ) : isError ? (
-          <div className="alert alert--remove">
+          <div className="alert" ref={alertRef} onClick={removeHandler}>
             <h1>Transaction Will Fail</h1>
           </div>
         ) : (!isPending && myEvents[0]) ? (

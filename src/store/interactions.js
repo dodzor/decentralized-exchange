@@ -5,10 +5,12 @@ import { lowerCase } from 'lodash';
 import { exchange } from './reducers';
 
 export const loadProvider = (dispatch) => {
-    const connection = new ethers.providers.Web3Provider(window.ethereum);
-    dispatch({ type: 'PROVIDER_LOADED', connection });
+    if (window.ethereum) {
+        const connection = new ethers.providers.Web3Provider(window.ethereum);
+        dispatch({ type: 'PROVIDER_LOADED', connection });
 
-    return connection;
+        return connection;
+    }
 }
 
 export const loadNetwork = async (dispatch, provider) => {
@@ -19,16 +21,22 @@ export const loadNetwork = async (dispatch, provider) => {
 };
 
 export const loadAccount = async (dispatch, provider) => {
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    const account = ethers.utils.getAddress(accounts[0]);
+    if (window.ethereum) {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const account = ethers.utils.getAddress(accounts[0]);
 
-    dispatch({ type: 'ACCOUNT_LOADED', account });
+        dispatch({ type: 'ACCOUNT_LOADED', account });
 
-    let balance = await provider.getBalance(account);
-    balance = ethers.utils.formatEther(balance);
-    dispatch({ type: 'ETHER_BALANCE_LOADED', balance});
+        let balance = await provider.getBalance(account);
+        balance = ethers.utils.formatEther(balance);
+        dispatch({ type: 'ETHER_BALANCE_LOADED', balance});
 
-    return account;
+        return account;
+    } else {
+        dispatch({ type: 'NO_METAMASK'})
+
+        return false;
+    }
 };
 
 export const loadTokens = async ( provider, addresses, logos, dispatch ) => {   

@@ -9,6 +9,7 @@ const Alert = () => {
     const isPending = useSelector(state => state.exchange.transaction && state.exchange.transaction.isPending);
     const isError = useSelector(state => state.exchange.transaction && state.exchange.transaction.isError);
     const account = useSelector(state => state.provider.account);
+    const accountMessage = useSelector(state => state.provider.message);
     const chainId = useSelector(state => state.provider.chainId);
     const myEvents = useSelector(myEventsSelector);
 
@@ -45,6 +46,12 @@ const Alert = () => {
               {myEvents[0].transactionHash.slice(0, 6) + '...' + myEvents[0].transactionHash.slice(60, 66)}
             </a>
           </div>
+       ) : !account && accountMessage ? (
+          <a href="https://metamask.io/" target="_blank">
+            <div className="alert" ref={alertRef} onClick={removeHandler}>
+              <h1><a>Please download and install Metamask!</a></h1>
+            </div>
+          </a>
         ) : (
           <div className="alert alert--remove" onClick={removeHandler} ref={alertRef}></div>
         )} 

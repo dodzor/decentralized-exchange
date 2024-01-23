@@ -11,7 +11,7 @@ import {
   loadAllOrders 
 } from '../store/interactions';
 
-import config from '../config';
+import config from '../config.json';
 import Navbar from './Navbar';
 import Markets from './Markets';
 import Balance from './Balance';
@@ -29,31 +29,34 @@ function App() {
   const loadBlockchainData = async () => {
 
     const provider = loadProvider(dispatch);
-    const chainId = await loadNetwork(dispatch, provider);
-
-    window.ethereum.on('chainChanged', () => {
-      window.location.reload(); 
-    });
-
-    // Load account when account changes
-    window.ethereum.on('accountsChanged', () => {
-      loadAccount(dispatch, provider);
-    });
     
-    const dext = config[chainId].DEXT;
-    const pir = config[chainId].PIR;
+    if (provider) {
+      const chainId = await loadNetwork(dispatch, provider);
+    
+      window.ethereum.on('chainChanged', () => {
+        window.location.reload(); 
+      });
+  
+      // Load account when account changes
+      window.ethereum.on('accountsChanged', () => {
+        loadAccount(dispatch, provider);
+      });
 
-    if (config[chainId]) {
-      await loadTokens(provider, [dext.address, pir.address], ['dext', 'pir'], dispatch);
-    }
-
-    const exchangeCfg = config[chainId].exchange;
-    if (exchangeCfg) {
-      const exchange = await loadExchange(provider, exchangeCfg.address, dispatch);
-
-      loadAllOrders(provider, exchange, dispatch);
-
-      subscribeToEvents(exchange, dispatch);
+      const dext = config[chainId].DEXT;
+      const pir = config[chainId].PIR;
+  
+      if (config[chainId]) {
+        await loadTokens(provider, [dext.address, pir.address], ['dext', 'pir'], dispatch);
+      }
+  
+      const exchangeCfg = config[chainId].exchange;
+      if (exchangeCfg) {
+        const exchange = await loadExchange(provider, exchangeCfg.address, dispatch);
+  
+        loadAllOrders(provider, exchange, dispatch);
+  
+        subscribeToEvents(exchange, dispatch);
+      }
     }
   }
 

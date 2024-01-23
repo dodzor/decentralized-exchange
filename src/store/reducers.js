@@ -20,6 +20,12 @@ export const provider = (state = {}, action) => {
                 ...state,
                 balance: action.balance 
             }
+        case 'NO_METAMASK':
+            return {
+                ...state,
+                account: null,
+                message: 'No Metamask'
+            }
         default:
             return state;
     }

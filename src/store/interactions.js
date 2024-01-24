@@ -39,7 +39,7 @@ export const loadAccount = async (dispatch, provider) => {
     }
 };
 
-export const loadTokens = async ( provider, addresses, logos, dispatch ) => {   
+export const loadTokens = async (provider, addresses, logos, dispatch) => {   
     let token, symbol;
     const logo1 = lowerCase(logos[0]).replace(/\s+/g, '');
     const logo2 = lowerCase(logos[1]).replace(/\s+/g, '');

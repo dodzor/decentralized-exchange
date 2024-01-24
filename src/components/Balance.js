@@ -4,6 +4,9 @@ import { useEffect, useState, useRef } from 'react';
 import { loadBalances } from '../store/interactions'; 
 import { transferTokens } from '../store/interactions';
 
+import logo1Default from '../assets/dext.png';
+import logo2Default from '../assets/pir.png';
+
 const Balance = () => {
     const [token1TransferAmmount, setToken1TransferAmmount] = useState(0)
     const [token2TransferAmmount, setToken2TransferAmmount] = useState(0)
@@ -36,13 +39,20 @@ const Balance = () => {
     useEffect(() => {
       async function loadImage() {
         try {
-          let logoFileName = logos[0]; 
-          let imageModule = await import(`../assets/${logoFileName}.png`);
-          setLogo1Image(imageModule.default);
+          let logoFileName, imageModule;
+          if (logos.length) {
+            logoFileName = logos[0]; 
+            if (logoFileName) {
+              imageModule = await import(`../assets/${logoFileName}.png`);
+              setLogo1Image(imageModule.default);
+            }
 
-          logoFileName = logos[1]; 
-          imageModule = await import(`../assets/${logoFileName}.png`);
-          setLogo2Image(imageModule.default);
+            logoFileName = logos[1]; 
+            if (logoFileName) {
+              imageModule = await import(`../assets/${logoFileName}.png`);
+              setLogo2Image(imageModule.default);
+            }
+          }
         } catch (error) {
           console.error(error);
         }
@@ -117,7 +127,7 @@ const Balance = () => {
   
         <div className='exchange__transfers--form'>
           <div className='flex-between'>
-            <p><small>Token</small><br /><img src={logo1Image} width='20' alt="DEXT logo"></img>{symbols && symbols[0]}</p>
+            <p><small>Token</small><br /><img src={logo1Image ? logo1Image : logo1Default} width='20' alt="DEXT logo"></img>{symbols && symbols[0]}</p>
             <p><small>Wallet</small>{tokenBalances && tokenBalances[0]}</p>
             <p><small>Exchange</small>{exchangeBalances && exchangeBalances[0]}</p>
           </div>
@@ -142,7 +152,7 @@ const Balance = () => {
   
         <div className='exchange__transfers--form'>
           <div className='flex-between'>
-            <p><small>Token</small><br /><img src={logo2Image} width='20' alt="Pirate logo"></img>{symbols && symbols[1]}</p>
+            <p><small>Token</small><br /><img src={logo2Image ? logo2Image : logo2Default} width='20' alt="Pirate logo"></img>{symbols && symbols[1]}</p>
             <p><small>Wallet</small>{tokenBalances && tokenBalances[1]}</p>
             <p><small>Exchange</small>{exchangeBalances && exchangeBalances[1]}</p>
           </div>

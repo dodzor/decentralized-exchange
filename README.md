@@ -15,3 +15,9 @@
 
 ## Compile React
 ### `npm run start` 
+
+TODO'S:
+1. Add real tokens to the exchange
+2. User Onboarding with product tour
+    * install Metamask
+    

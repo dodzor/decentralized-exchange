@@ -40,12 +40,23 @@ export const loadAccount = async (dispatch, provider) => {
 };
 
 export const loadTokens = async (provider, addresses, logos, dispatch) => {   
+    try {
+        const isDeployed = await isContractDeployed(addresses[0], provider);
+        if (!isDeployed) {
+            console.error('No contract found at address:', addresses[0]);
+            return;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+    
     let token, symbol;
     const logo1 = lowerCase(logos[0]).replace(/\s+/g, '');
     const logo2 = lowerCase(logos[1]).replace(/\s+/g, '');
     
     token = new ethers.Contract(addresses[0], TOKEN_ABI, provider);
     symbol = await token.symbol();
+
     dispatch({ type: 'TOKEN_1_LOADED', token, symbol, logo1 });
 
     token = new ethers.Contract(addresses[1], TOKEN_ABI, provider);
@@ -54,6 +65,14 @@ export const loadTokens = async (provider, addresses, logos, dispatch) => {
 
     return token;
 };
+
+async function isContractDeployed(address, provider) {
+    // Get the code at the address
+    const code = await provider.getCode(address);
+    
+    // If code length is greater than '0x' (empty), then a contract exists
+    return code !== '0x';
+}
 
 export const loadExchange = async (provider, address, dispatch) => {
     const exchange = new ethers.Contract(address, EXCHANGE_ABI, provider);

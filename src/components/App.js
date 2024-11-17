@@ -29,10 +29,9 @@ function App() {
   const loadBlockchainData = async () => {
 
     const provider = loadProvider(dispatch);
-    
     if (provider) {
       const chainId = await loadNetwork(dispatch, provider);
-    
+
       window.ethereum.on('chainChanged', () => {
         window.location.reload(); 
       });
